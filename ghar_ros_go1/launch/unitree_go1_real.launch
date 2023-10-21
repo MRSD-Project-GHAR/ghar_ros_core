@@ -1,0 +1,9 @@
+<launch>
+
+    <node pkg="unitree_legged_real" type="twist_sub" name="node_twist_sub" output="screen"/>
+    
+    <include file="$(find ghar_ros_core)/launch/realsense_ghar.launch" />
+    <include file="$(find ghar_ros_core)/ghar_ros_go1/launch/rtabmap_go1.launch" />
+    <include file="$(find ghar_ros_core)/ghar_ros_go1/launch/move_base_go1.launch" />
+
+</launch>
