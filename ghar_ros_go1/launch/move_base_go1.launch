@@ -1,12 +1,44 @@
 <launch>
   <!-- Arguments -->
   <arg name="cmd_vel_topic" default="/cmd_vel" />
-  <arg name="odom_topic" default="/odom" />
+  <arg name="odom_topic" default="/rtabmap/odom" />
   <arg name="cam_topic" default="/camera_link" />
   <arg name="move_forward_only" default="false"/>
 
-  <!-- move_base -->
+  <arg name="base_global_planner" default="navfn/NavfnROS"/>
+  <arg name="base_local_planner" default="dwa_local_planner/DWAPlannerROS"/>
+  <!-- <arg name="base_local_planner" default="base_local_planner/TrajectoryPlannerROS"/> -->
+  <remap from="cmd_vel" to="/cmd_vel"/>
+  <remap from="odom" to="$(arg odom_topic)"/>
+  
+  <arg name="no_static_map" default="true"/>
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+    <param name="base_global_planner" value="$(arg base_global_planner)"/>
+    <param name="base_local_planner" value="$(arg base_local_planner)"/>  
+    <rosparam file="$(find ghar_ros_core)/param/planner.yaml" command="load"/>
+
+    <!-- observation sources located in costmap_common.yaml -->
+    <rosparam file="$(find ghar_ros_core)/param/costmap_common.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find ghar_ros_core)/param/costmap_common.yaml" command="load" ns="local_costmap" />
+
+    <!-- local costmap, needs size -->
+    <rosparam file="$(find ghar_ros_core)/param/costmap_local.yaml" command="load" ns="local_costmap" />
+    <param name="local_costmap/width" value="10.0"/>
+    <param name="local_costmap/height" value="10.0"/>
+
+    <!-- static global costmap, static map provides size -->
+    <rosparam file="$(find ghar_ros_core)/param/costmap_global_static.yaml" command="load" ns="global_costmap" unless="$(arg no_static_map)"/>
+    
+    <!-- global costmap with laser, for odom_navigation_demo -->
+    <rosparam file="$(find ghar_ros_core)/param/costmap_global_laser.yaml" command="load" ns="global_costmap" if="$(arg no_static_map)"/>
+    <param name="global_costmap/width" value="100.0" if="$(arg no_static_map)"/>
+    <param name="global_costmap/height" value="100.0" if="$(arg no_static_map)"/>
+
+  </node>
+
+  <!-- move_base -->
+  <!-- <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
     <param name="base_global_planner" value="global_planner/GlobalPlanner" />
     <rosparam file="$(find ghar_ros_core)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
@@ -18,12 +50,37 @@
     <rosparam file="$(find ghar_ros_core)/param/base_global_planner_params.yaml" command="load" />
     <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
     <remap from="odom" to="$(arg odom_topic)"/>
-    <remap from="$(arg cam_topic)" to="base"/>
+    <remap from="map"  to="rtabmap/grid_map"/>
     <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
-  </node>
+  </node> -->
+    <!-- <remap from="$(arg cam_topic)" to="base"/> -->
 
+   <!-- <node
+    pkg="move_base"
+    type="move_base"
+    respawn="false"
+    name="move_base"
+    output="screen">
+    <rosparam file="$(find ghar_ros_core)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find ghar_ros_core)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find ghar_ros_core)/param/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find ghar_ros_core)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find ghar_ros_core)/param/move_base_params.yaml" command="load" />
+    <rosparam file="$(find ghar_ros_core)/param/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find ghar_ros_core)/param/base_global_planner_params.yaml" command="load" />
+    <rosparam file="$(find interbotix_xslocobot_nav)/config/common_costmap_params.yaml" command="load" ns="global_costmap"/>
+    <rosparam file="$(find interbotix_xslocobot_nav)/config/common_costmap_params.yaml" command="load" ns="local_costmap"/>
+    <rosparam file="$(find interbotix_xslocobot_nav)/config/local_planner_params.yaml"  command="load"/>
+    <rosparam file="$(find interbotix_xslocobot_nav)/config/global_planner_params.yaml" command="load"/>
+    <rosparam file="$(find interbotix_xslocobot_nav)/config/move_base_params.yaml"      command="load"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg robot_name)/base_footprint"/>
+    <param name="local_costmap/global_frame"      value="$(arg robot_name)/odom"/>
+    <param name="local_costmap/robot_base_frame"  value="$(arg robot_name)/base_footprint"/>
 
-
+    <remap from="cmd_vel"                         to="$(arg cmd_vel_topic)"/>
+    <remap from="map"                             to="rtabmap/grid_map"/>
+    <remap from="odom"                            to="$(arg odom_topic)"/>
+  </node> -->
 
   
 </launch>
