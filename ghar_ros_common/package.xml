@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>ghar_ros_core</name>
+  <name>ghar_ros_common</name>
   <version>0.0.0</version>
-  <description>The ghar_ros_core package</description>
+  <description>The ghar_ros_common package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
