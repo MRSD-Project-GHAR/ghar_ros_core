@@ -62,8 +62,8 @@
     <arg name="use_rviz"                          value="$(arg use_rviz)"/>
     <arg name="base_type"                         value="$(arg base_type)"/>
     <arg name="rviz_frame"                        value="map"/>
-    <arg name="use_camera"                        value="true"/>
-    <arg name="align_depth"                       value="true"/>
+    <arg name="use_camera"                        value="false"/>
+    <arg name="align_depth"                       value="false"/>
     <arg name="use_base"                          value="true"/>
     <arg name="use_dock"                          value="true"/>
   </include>
