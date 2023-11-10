@@ -1,12 +1,12 @@
 
 <launch>
     <arg name="robot_name"                        default="locobot"/>
-    <arg name="rviz"                              default="true"/>
-    <arg name="rtabmap_viz"                       default="true"/>
+    <arg name="rviz"                              default="false"/>
+    <arg name="rtabmap_viz"                       default="false"/>
     <arg name="database_path"                     default="~/.ros/rtabmap.db"/>
     <arg name="localization"                      default="false"/>
     <arg name="delete_db_on_start"                default="true" />
-    <arg name="use_sim_time"                      default="true"/>
+    <arg name="use_sim_time"                      default="false"/>
     <param if="$(arg use_sim_time)" name="use_sim_time" value="true"/>
 
     <arg name="rtabmap_args"                      default=""/>
