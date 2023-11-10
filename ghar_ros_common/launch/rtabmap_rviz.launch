@@ -1,0 +1,6 @@
+<launch>
+    <arg name="rviz_cfg"                          default="$(find rtabmap_launch)/launch/config/rgbd.rviz" />
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_cfg)"/>
+
+</launch>

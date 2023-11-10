@@ -1,12 +1,12 @@
 
 <launch>
     <arg name="robot_name"                        default="locobot"/>
-    <arg name="rviz"                              default="true"/>
-    <arg name="rtabmap_viz"                       default="true"/>
-    <arg name="database_path"                     default="~/.ros/rtabmap.db"/>
-    <arg name="localization"                      default="false"/>
+    <arg name="rviz"                              default="false"/>
+    <arg name="rtabmap_viz"                       default="false"/>
+    <arg name="database_path"                     default="~/.ros/rtabmap_nsh_4th.db"/>
+    <arg name="localization"                      default="true"/>
     <arg name="delete_db_on_start"                default="true" />
-    <arg name="use_sim_time"                      default="true"/>
+    <arg name="use_sim_time"                      default="false"/>
     <param if="$(arg use_sim_time)" name="use_sim_time" value="true"/>
 
     <arg name="rtabmap_args"                      default=""/>
@@ -19,15 +19,11 @@
     <arg name="fiducial_topic"                    default="/fiducial_transforms" />  <!-- aruco_detect async subscription, use tag_linear_variance and tag_angular_variance to set covriance -->
 
     <!-- TF FRAMES -->
-    <!-- <node pkg="tf" type="static_transform_publisher" name="world_to_world_map"
-          args="0.0 0.0 0.0 0.0 -0.7071068 0.7071068 0.0  /world /world_map 100" />
-    
-    <node pkg="tf" type="static_transform_publisher" name="world_map_to_map"
-          args="-4.45 -6.18 0.0 0.0 0.0 0.0 1.0 /world_map /map 100" /> -->
-
+    <!-- First translate from the world and come to map frame -->
+    <!-- Then Do the rotation along z axis for -90 degrees -->
     <node pkg="tf" type="static_transform_publisher" name="world_to_map"
-          args="4.45 0.0 6.18 0.0 -0.7071068 0.7071068 0.0 /world /map 100" />
-    
+          args="-6.18 4.45 0.0 0.0 0.0 -0.7071068 0.7071068 /world /map 100" />
+      
     <arg name="rtabmap_custom_args" default="$(arg rtabmap_args)
                                             --Optimizer/Strategy 1 
                                             --Optimizer/PriorsIgnored false 
@@ -50,7 +46,7 @@
     </node>
 
     <!-- Visual SLAM -->
-    <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg rtabmap_custom_args)">
+    <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg rtabmap_custom_args)"  respawn="true">
       <param name="delete_db_on_start"   value="$(arg delete_db_on_start)"/>
       <param name="localization"         value="$(arg localization)"/>
       <param name="subscribe_depth" type="bool" value="true"/>
