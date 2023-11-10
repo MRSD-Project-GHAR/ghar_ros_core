@@ -47,6 +47,7 @@
     <!-- Visual SLAM -->
     <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg rtabmap_custom_args)" respawn="true">
       <param name="delete_db_on_start"   value="$(arg delete_db_on_start)"/>
+      <param name="database_path"        value="$(arg database_path)"/>
       <param name="localization"         value="$(arg localization)"/>
       <!-- <param name="subscribe_depth" type="bool" value="true"/> -->
       <param name="frame_id" type="string" value="$(arg frame_id)"/>
