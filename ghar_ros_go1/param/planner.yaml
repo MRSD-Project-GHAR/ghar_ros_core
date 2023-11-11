@@ -1,5 +1,5 @@
 controller_frequency: 5.0
-recovery_behaviour_enabled: true
+recovery_behaviour_enabled: false
 
 NavfnROS:
   allow_unknown: true # Specifies whether or not to allow navfn to create plans that traverse unknown space.
@@ -57,18 +57,18 @@ DWAPlannerROS:
   acc_lim_y: 0
   acc_lim_th: 3.2
 
-  max_vel_x: 0.5
+  max_vel_x: 0.2
   min_vel_x: 0.0
   max_vel_y: 0
   min_vel_y: 0
 
-  max_vel_trans: 0.5
+  max_vel_trans: 0.2
   min_vel_trans: 0.1
-  max_vel_rot: 1.0
-  min_vel_rot: 0.2
+  max_vel_rot: 0.5
+  min_vel_rot: 0.05
 
   # Goal Tolerance Parameters
-  yaw_goal_tolerance: 0.1
+  yaw_goal_tolerance: 10.0
   xy_goal_tolerance: 0.2
   latch_xy_goal_tolerance: false
 
