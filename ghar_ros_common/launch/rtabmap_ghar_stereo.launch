@@ -85,6 +85,9 @@
 
     <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_cfg)"/>
 
+    <!-- Add rosrun python script for diagnostic node -->
+    <node name="diagnostic_node" pkg="ghar_ros_common" type="monitor_and_respawn_node.py" output="screen" />
+
 
   </group>        
 
