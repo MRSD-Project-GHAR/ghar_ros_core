@@ -4,7 +4,7 @@
 On the robot:
 ~~~
 roslaunch realsense2_camera rs_camera.launch enable_infra1:=true enable_infra2:=true
-roslaunch ghar_ros_common rtabmap_ghar_stereo.launch
+cp ~/rtabmap_nsh_4th_10th_nov_2_loops_forward_1_loop_backward_only_stereo_corrected_world.db ~/.ros/rtabmap_nsh_4th.db && roslaunch ghar_ros_common rtabmap_ghar_stereo.launch
 roslaunch ghar_ros_locobot xslocobot_nav_empty.launch robot_model:=locobot_wx200 use_lidar:=false
 ~~~
 
@@ -19,7 +19,7 @@ roslaunch mbf_rrts_planner planner_move_base.launch robot_name:=locobot # Wait f
 On the robot:
 ~~~
 roslaunch realsense2_camera rs_camera.launch enable_infra1:=true enable_infra2:=true
-roslaunch ghar_ros_common rtabmap_ghar_stereo.launch
+cp ~/rtabmap_nsh_4th_10th_nov_2_loops_forward_1_loop_backward_only_stereo_corrected_world.db ~/.ros/rtabmap_nsh_4th.db && roslaunch ghar_ros_common rtabmap_ghar_stereo.launch
 roslaunch ghar_ros_go1 move_base_go1.launch 
 ~~~
 
