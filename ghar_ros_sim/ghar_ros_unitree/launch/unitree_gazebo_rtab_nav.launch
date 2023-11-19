@@ -1,0 +1,208 @@
+<launch>
+    <arg name="wname" default="earth"/>
+    <arg name="rname" default="go1"/>
+    <arg name="robot_path" value="(find $(arg rname)_description)"/>
+    <arg name="dollar" value="$"/>
+    <arg name="rviz" default="false"/>
+    <arg name="rtabmap_viz" default="false"/>
+    <arg name="paused" default="true"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+    <arg name="queue_size" default="30"/>
+
+    <!-- Debug mode will hung up the robot, use "true" or "false" to switch it. -->
+    <arg name="user_debug" default="false"/>
+
+    <arg if="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" value="$(find unitree_gazebo)/worlds/$(arg wname).world" />
+    <arg unless="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" value="$(find gazebo_worlds)/gazebo/worlds/$(arg wname).world" />
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <!-- <arg name="world_name" value="$(arg world_path)"/> -->
+        <arg name="world_name" value="/home/madhu/empty_house_with_floor.world"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="robot_description"
+           command="$(find xacro)/xacro --inorder '$(arg dollar)$(arg robot_path)/xacro/robot.xacro' 
+           DEBUG:=$(arg user_debug)"/>
+
+    <!-- Start position of waffle robot in scene. -->
+    <arg name="x_pos" default="-3.0" doc="Starting x coordinate of the robot in the simulation scene. "/>
+    <arg name="y_pos" default="1.0"  doc="Starting y coordinate of the robot in the simulation scene. "/>
+    <arg name="z_pos" default="0.6"  doc="Starting z coordinate of the robot in the simulation scene. "/>
+    
+    <!-- World frame -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.6 0.0 0.0 0.0 /world /map" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.6 0.0 0.0 0.0 /map /odom" />
+
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <!-- Set trunk and joint positions at startup -->
+    <!-- <node pkg="gazebo_ros" type="spawn_model" name="urdf_spawner" respawn="false" output="screen"
+        args="-urdf -z 0.6 -model $(arg rname)_gazebo -param robot_description -unpause"/> -->
+
+    <!-- Spawn turtlebot into gazebo based on robot_description. -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+        args="-urdf -model $(arg rname)_gazebo -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description -unpause"/>
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <rosparam file="$(arg dollar)$(arg robot_path)/config/robot_control.yaml" command="load"/>
+
+    <!-- load the controllers -->
+    <node pkg="controller_manager" type="spawner" name="controller_spawner" respawn="false"
+          output="screen" ns="/$(arg rname)_gazebo" args="joint_state_controller
+          FL_hip_controller FL_thigh_controller FL_calf_controller
+          FR_hip_controller FR_thigh_controller FR_calf_controller
+          RL_hip_controller RL_thigh_controller RL_calf_controller
+          RR_hip_controller RR_thigh_controller RR_calf_controller "/>
+
+    <!-- convert joint states to TF transforms for rviz, etc -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"
+          respawn="false" output="screen">
+        <remap from="/joint_states" to="/$(arg rname)_gazebo/joint_states"/>
+    </node>
+
+    <!-- <node pkg="unitree_gazebo" type="servo" name="servo" required="true" output="screen"/> -->
+
+    <!-- load the parameter unitree_controller -->
+    <include file="$(find unitree_controller)/launch/set_ctrl.launch">
+        <arg name="rname" value="$(arg rname)"/>
+    </include>
+
+  
+    <!-- Rviz -->
+    <group if="$(eval arg('rviz') == true)">
+        <include file="$(arg dollar)(find $(arg rname)_description)/launch/$(arg rname)_rviz_gazebo.launch">
+            <arg name="user_debug" value="$(arg user_debug)"/>
+        </include>
+    </group>
+
+
+    <arg name="base_frame" default="/base"/>
+    <arg name="odom_frame" default="/odom"/>
+    
+    <arg name="localization" default="false"/>
+    <arg name="database_path" default="~/.ros/rtabmap.unitree.db"/>
+    <arg name="publish_cloud" default="true"/>
+    <arg     if="$(arg localization)" name="rtabmap_args" default=""/>
+    <arg unless="$(arg localization)" name="rtabmap_args" default="-d"/>
+
+    <group ns="rtabmap">
+        <node pkg="rtabmap_sync" type="rgbd_sync" name="rgbd_sync" output="screen">
+            <remap from="rgb/image"         to="/camera_face/color/image_raw"/>
+            <remap from="depth/image"       to="/camera_face/depth/image_raw"/>
+            <remap from="rgb/camera_info"   to="/camera_face/color/camera_info"/>
+        </node>
+
+        <!-- <node name="cam_odometry" pkg="rtabmap_odom" type="rgbd_odometry" output="screen" respawn="true">
+            <remap from="rgb/image"         to="/camera_face/color/image_raw"/>
+            <remap from="depth/image"       to="/camera_face/depth/image_raw"/>
+            <remap from="rgb/camera_info"   to="/camera_face/color/camera_info"/>
+
+            <param name="publish_null_when_lost" value="false"/>
+            <param name="Odom/FilteringStrategy" type="string" value="1"/>
+            <param name="frame_id" type="string" value="$(arg base_frame)"/>
+        </node> -->
+
+        <node name="rtabmap" pkg="rtabmap_slam" type="rtabmap" output="screen" args="$(arg rtabmap_args)">
+            <remap from="rgb/image"         to="/camera_face/color/image_raw"/>
+            <remap from="depth/image"       to="/camera_face/depth/image_raw"/>
+            <remap from="rgb/camera_info"   to="/camera_face/color/camera_info"/>
+        
+            <param name="database_path"         type="string" value="$(arg database_path)"/>
+            <param name="frame_id"              type="string" value="$(arg base_frame)"/>
+            <!-- <param name="subscribe_rgb"         type="bool"   value="false"/> -->
+            <param name="subscribe_depth"       type="bool"   value="true"/>
+            <!-- <param name="subscribe_rgbd"        type="bool"   value="true"/> -->
+            <!-- <param name="subscribe_scan"        type="bool"   value="true"/> -->
+            <!-- <param name="approx_sync"           type="bool"   value="true"/> -->
+            <param name="queue_size"            type="int"    value="$(arg queue_size)"/>
+
+            <!-- use actionlib to send goals to move_base -->
+            <param name="use_action_for_goal"   type="bool"   value="true"/>
+            <remap from="move_base"            to="/move_base"/>
+
+            <!-- inputs -->
+            <!-- <remap from="scan"            to="/$(arg rname)_gazebo/scan"/> -->
+            <remap from="odom"            to="/odom"/>
+            <remap from="rgbd_image"       to="rgbd_image"/>
+
+            <!-- output -->
+            <remap from="grid_map" to="/map"/>
+
+            <!-- RTAB-Map's parameters -->
+            <param name="Reg/Strategy"                 type="string" value="1"/>
+            <param name="Reg/Force3DoF"                type="string" value="true"/>
+            <param name="GridGlobal/MinSize"           type="string" value="20"/>
+
+            <!-- localization mode -->
+            <param     if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+            <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+        </node>
+
+        <!-- visualization with rtabmap_viz -->
+        <node if="$(arg rtabmap_viz)" pkg="rtabmap_viz" type="rtabmap_viz" name="rtabmap_viz" args="-d $(find rtabmap_demos)/launch/config/rgbd_gui.ini" output="screen">
+            <param name="subscribe_scan"   type="bool"   value="true"/>
+            <param name="subscribe_odom"   type="bool"   value="true"/>
+            <param name="frame_id"         type="string" value="base"/>
+            <param name="approx_sync"      type="bool"   value="true"/>
+            <param name="queue_size"       type="int"    value="$(arg queue_size)"/>
+
+            <remap from="odom"            to="/odom"/>
+            <!-- <remap from="scan"            to="/$(arg rname)_gazebo/scan"/> -->
+        </node>
+    </group>
+
+    <!-- move_base -->
+    <include file="$(find unitree_move_base)/launch/move_base.launch">
+        <!-- <arg name="model" value="$(arg model)" />
+        <arg name="move_forward_only" value="$(arg move_forward_only)"/> -->
+        <arg name="rname"   value="$(arg rname)"/>
+    </include>
+
+
+    <!-- Publish tf 'base_footprint' as pose.-->
+    <node pkg="elevation_mapping_demos" type="tf_to_pose_publisher.py" name="unitree_pose_publisher">
+        <param name="from_frame" type="string" value="odom"/>
+        <param name="to_frame" type="string" value="base"/>
+    </node>
+
+    <node pkg="elevation_mapping" type="elevation_mapping" name="elevation_mapping" output="screen">
+        <rosparam command="load" file="$(find elevation_mapping_demos)/config/robots/ground_truth_demo.yaml" />
+        <rosparam command="load" file="$(find elevation_mapping_demos)/config/elevation_maps/long_range.yaml" />
+        <rosparam command="load" file="$(find elevation_mapping)/config/sensor_processors/perfect.yaml" />
+        <rosparam command="load" file="$(find elevation_mapping_demos)/config/postprocessing/postprocessor_pipeline.yaml" />
+    </node>
+
+    <node pkg="point_cloud_io" type="read" name="read_ply" output="screen">
+        <!-- <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/maze.ply" /> -->
+        <!-- <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/nsh-floor-A-april-3rd-no-tf.ply" /> -->
+        <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/rtab_house_gazebo_cloud.ply" />
+
+        <param name="topic" value="/points" />
+        <param name="frame" value="map" />
+        <param name="rate" value="1.0" />
+    </node>
+
+
+
+    <!-- <group ns="$(arg rname)"> -->
+
+
+        <!-- <include file="$(find unitree_move_base)/launch/move_base.launch"/> -->
+
+        <!-- <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz"
+            args="-d $(find champ_navigation)/rviz/navigate.rviz -f $(arg frame_prefix)map"
+            output="screen"/> -->
+
+        <!-- <node if="$(arg rviz)" pkg="rviz" type="rviz" name="rviz"
+            args="-d $(find unitree_move_base)/rviz/move_base.rviz"/> -->
+
+    <!-- </group> -->
+</launch>

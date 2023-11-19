@@ -22,7 +22,7 @@ roslaunch ghar_ros_turtlebot3 planner_move_base_turtlebot3.launch
 
 ## Launch the simulation 
 ```
-roslaunch ghar_ros_unitree unitree_gazebo.launch
+roslaunch ghar_ros_unitree unitree_gazebo_rtab_nav.launch
 ```
 
 ## Launch the control node
