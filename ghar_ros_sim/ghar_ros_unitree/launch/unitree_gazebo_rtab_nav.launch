@@ -20,7 +20,8 @@
     
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <!-- <arg name="world_name" value="$(arg world_path)"/> -->
-        <arg name="world_name" value="/home/madhu/empty_house_with_floor.world"/>
+        <!-- <arg name="world_name" value="/home/madhu/empty_house_with_floor.world"/> -->
+        <arg name="world_name" value="/home/madhu/empty_house_changed_origin_with_floor.world"/>
         <arg name="debug" value="$(arg debug)"/>
         <arg name="gui" value="$(arg gui)"/>
         <arg name="paused" value="$(arg paused)"/>
@@ -34,13 +35,13 @@
            DEBUG:=$(arg user_debug)"/>
 
     <!-- Start position of waffle robot in scene. -->
-    <arg name="x_pos" default="-3.0" doc="Starting x coordinate of the robot in the simulation scene. "/>
-    <arg name="y_pos" default="1.0"  doc="Starting y coordinate of the robot in the simulation scene. "/>
+    <arg name="x_pos" default="0.0" doc="Starting x coordinate of the robot in the simulation scene. "/>
+    <arg name="y_pos" default="0.0"  doc="Starting y coordinate of the robot in the simulation scene. "/>
     <arg name="z_pos" default="0.6"  doc="Starting z coordinate of the robot in the simulation scene. "/>
     
     <!-- World frame -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.6 0.0 0.0 0.0 /world /map" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.6 0.0 0.0 0.0 /map /odom" />
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.6 0.0 0.0 0.0 /world /map" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.6 0.0 0.0 0.0 /map /odom" /> -->
 
     <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
     <!-- Set trunk and joint positions at startup -->
@@ -137,7 +138,7 @@
             <remap from="rgbd_image"       to="rgbd_image"/>
 
             <!-- output -->
-            <remap from="grid_map" to="/map"/>
+            <remap from="grid_map" to="/rtab_map"/>
 
             <!-- RTAB-Map's parameters -->
             <param name="Reg/Strategy"                 type="string" value="1"/>

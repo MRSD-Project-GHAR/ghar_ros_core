@@ -17,6 +17,12 @@ roslaunch rand_grid_map_gen map_filter.launch robot_name:=locobot
 roslaunch mbf_rrts_planner planner_move_base.launch robot_name:=locobot # Wait for the move_base server to start on the robot if you want to do local planning
 ~~~
 
+To key-op and correct odom
+~~~
+roslaunch kobuki_keyop keyop.launch __ns:=locobot
+~~~
+
+
 ## On the Go1
 Connect Go1 to the larger router (TP-Link_3585)
 

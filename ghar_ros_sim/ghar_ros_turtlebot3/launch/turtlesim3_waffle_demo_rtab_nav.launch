@@ -2,15 +2,16 @@
 
 <launch>
   <!-- Start position of waffle robot in scene. -->
-  <arg name="x_pos" default="-3.0" doc="Starting x coordinate of the robot in the simulation scene. "/>
-  <arg name="y_pos" default="1.0"  doc="Starting y coordinate of the robot in the simulation scene. "/>
-  <arg name="z_pos" default="0.0"  doc="Starting z coordinate of the robot in the simulation scene. "/>
+  <arg name="x_pos" default="0.0" doc="Starting x coordinate of the robot in the simulation scene. "/>
+  <arg name="y_pos" default="0.0"  doc="Starting y coordinate of the robot in the simulation scene. "/>
+  <arg name="z_pos" default="0.6"  doc="Starting z coordinate of the robot in the simulation scene. "/>
 
   <!-- Start gazebo server with turtlebot3_house scene. -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!-- Documentation taken from http://gazebosim.org/tutorials?tut=ros_roslaunch-->
     <!-- <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_house.world"/> -->
-    <arg name="world_name" value="/home/madhu/empty_house_with_floor.world"/>
+    <!-- <arg name="world_name" value="/home/madhu/empty_house_with_floor.world"/> -->
+    <arg name="world_name" value="/home/madhu/empty_house_changed_origin_with_floor.world"/>
     <arg name="paused" value="false"/> <!--S tart Gazebo in a paused state-->
     <arg name="use_sim_time" value="true"/> <!-- Tells ROS nodes asking for time to get the Gazebo-published simulation time, published over the ROS topic /clock-->
     <arg name="gui" value="true"/> <!-- Launch the user interface window of Gazebo-->
@@ -34,8 +35,8 @@
     <param name="to_frame" type="string" value="base_footprint"/>
   </node>
   
-  <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.0 0.0 0.0 0.0 /world /map" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.0 0.0 0.0 0.0 /map /odom" />
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.0 0.0 0.0 0.0 /world /map" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.0 0.0 0.0 0.0 /map /odom" /> -->
   
   <!-- Run a passthrough filter to down-sample the sensor point cloud.-->
   <node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager" output="screen"/>
@@ -139,7 +140,7 @@
     </node>
 
     <!-- visualization with rtabmap_viz -->
-    <!-- <node if="$(arg rtabmap_viz)" pkg="rtabmap_viz" type="rtabmap_viz" name="rtabmap_viz" args="-d $(find rtabmap_demos)/launch/config/rgbd_gui.ini" output="screen">
+    <node if="$(arg rtabmap_viz)" pkg="rtabmap_viz" type="rtabmap_viz" name="rtabmap_viz" args="-d $(find rtabmap_demos)/launch/config/rgbd_gui.ini" output="screen">
       <param name="subscribe_scan"   type="bool"   value="true"/>
       <param name="subscribe_odom"   type="bool"   value="true"/>
       <param name="frame_id"         type="string" value="base_footprint"/>
@@ -147,7 +148,7 @@
 
       <remap from="odom"            to="/odom"/>
       <remap from="scan"            to="/scan"/>
-    </node> -->
+    </node>
   </group>
 
   <!-- move_base -->
@@ -157,6 +158,6 @@
   </include>
 
   <!-- Launch RViz with the demo configuration. -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elevation_mapping_demos)/rviz/turtlebot3_waffle_demo.rviz"/>
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find elevation_mapping_demos)/rviz/turtlebot3_waffle_demo.rviz"/> -->
 
 </launch>
