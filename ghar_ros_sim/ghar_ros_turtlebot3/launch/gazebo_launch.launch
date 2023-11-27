@@ -1,0 +1,30 @@
+<launch>
+
+    <arg name="wname" default="earth"/>
+    <arg name="paused" default="true"/>
+    <arg name="use_sim_time" default="true"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="debug" default="false"/>
+    <!-- Debug mode will hung up the robot, use "true" or "false" to switch it. -->
+    <arg name="user_debug" default="false"/>
+
+    <arg if="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" value="$(find unitree_gazebo)/worlds/$(arg wname).world" />
+    <arg unless="$(eval arg('wname') == 'earth' or arg('wname') == 'space' or arg('wname') == 'stairs')" name="world_path" value="$(find gazebo_worlds)/gazebo/worlds/$(arg wname).world" />
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <!-- <arg name="world_name" value="$(arg world_path)"/> -->
+        <!-- <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_3.world"/> -->
+        <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_house_ghar.world"/>
+        <!-- <arg name="world_name" value="/home/madhu/empty_house_changed_origin_with_floor.world"/> -->
+
+        <!-- <arg name="world_name" value="/home/madhu/empty_with_floor.world"/> -->
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="gui" value="$(arg gui)"/>
+        <arg name="paused" value="$(arg paused)"/>
+        <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+        <arg name="headless" value="$(arg headless)"/>
+    </include>
+
+
+</launch>
