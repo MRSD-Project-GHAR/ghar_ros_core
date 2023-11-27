@@ -2,13 +2,12 @@
 
 ## Launch the simulation 
 ```
-export TURTLEBOT3_MODEL=waffle
 roslaunch ghar_ros_turtlebot3 turtlesim3_waffle_demo_rtab_nav.launch
 ```
 
 ## Launch the map filter node
 ```
-roslaunch rand_grid_map_gen map_filter.launch robot_name:=turtlebot3 grid_map_topic:=/elevation_mapping/elevation_map 
+roslaunch ghar_ros_turtlebot3 map_filter_turtlebot3.launch 
 ```
 ## Launch the RRTS node
 ```
