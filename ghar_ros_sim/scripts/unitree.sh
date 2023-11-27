@@ -24,7 +24,8 @@ tmux send-keys "roslaunch ghar_ros_unitree unitree_gazebo_rtab_nav.launch" Enter
 # Run the control in the second pane
 tmux select-pane -t 1
 tmux send-keys "sleep 10 && rosrun unitree_guide junior_ctrl" Enter
-tmux send-keys "sleep 13 && 2 && sleep 3 && 5" Enter
+tmux send-keys "tmux send-keys -t 2 '2'" Enter
+# tmux send-keys "sleep 15 && tmux send-keys -t 2 '5'" Enter
 
 # Run the gridmap filter script in the third pane
 tmux select-pane -t 2
