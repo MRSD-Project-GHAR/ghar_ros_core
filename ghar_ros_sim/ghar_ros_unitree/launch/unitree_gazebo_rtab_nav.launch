@@ -21,7 +21,8 @@
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <!-- <arg name="world_name" value="$(arg world_path)"/> -->
         <!-- <arg name="world_name" value="/home/madhu/empty_house_with_floor.world"/> -->
-        <arg name="world_name" value="/home/madhu/empty_house_changed_origin_with_floor.world"/>
+        <!-- <arg name="world_name" value="/home/madhu/empty_house_changed_origin_with_floor.world"/> -->
+        <arg name="world_name" value="/home/madhu/empty_with_floor.world"/>
         <arg name="debug" value="$(arg debug)"/>
         <arg name="gui" value="$(arg gui)"/>
         <arg name="paused" value="$(arg paused)"/>
@@ -40,8 +41,8 @@
     <arg name="z_pos" default="0.6"  doc="Starting z coordinate of the robot in the simulation scene. "/>
     
     <!-- World frame -->
-    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.6 0.0 0.0 0.0 /world /map" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.6 0.0 0.0 0.0 /map /odom" /> -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_to_map" output="screen" args="0.0 0.0 0.6 0.0 0.0 0.0 /world /map" />
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_odom" args="-3.0 1.0 0.6 0.0 0.0 0.0 /map /odom" /> -->
 
     <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
     <!-- Set trunk and joint positions at startup -->
@@ -164,12 +165,8 @@
     </group>
 
     <!-- move_base -->
-    <include file="$(find unitree_move_base)/launch/move_base.launch">
-        <!-- <arg name="model" value="$(arg model)" />
-        <arg name="move_forward_only" value="$(arg move_forward_only)"/> -->
-        <arg name="rname"   value="$(arg rname)"/>
+    <include file="$(find ghar_ros_unitree)/launch/move_base_unitree.launch">
     </include>
-
 
     <!-- Publish tf 'base_footprint' as pose.-->
     <node pkg="elevation_mapping_demos" type="tf_to_pose_publisher.py" name="unitree_pose_publisher">
@@ -187,8 +184,8 @@
     <node pkg="point_cloud_io" type="read" name="read_ply" output="screen">
         <!-- <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/maze.ply" /> -->
         <!-- <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/nsh-floor-A-april-3rd-no-tf.ply" /> -->
-        <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/rtab_house_gazebo_cloud.ply" />
-
+        <!-- <param name="file_path" value="$(find elevation_mapping_demos)/sample_data/rtab_house_gazebo_cloud.ply" /> -->
+        <param name="file_path" value="/home/madhu/.ros/cloud_empty.ply" />
         <param name="topic" value="/points" />
         <param name="frame" value="map" />
         <param name="rate" value="1.0" />
